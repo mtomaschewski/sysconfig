@@ -135,6 +135,11 @@ function write_resolv_conf()
     #
     #test -z "$2" && return 1
 
+    # skip write without to complain if it's a link
+    # to the systemd-resolved resolv.conf file.
+    local link=$(readlink "$ROOT$DESTLINK" 2>/dev/null)
+    case $link in *systemd*resolv*) return 1 ;; esac
+
     debug "write_resolv_conf: '$1' '$2'"
 
     TMP_FILE=`netconfig_mktemp "$ROOT$DESTFILE" 0644 0755` || return 3
